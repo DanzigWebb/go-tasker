@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm/logger"
 	"log"
 	"os"
+	"task-app/models"
 )
 
 var DB *gorm.DB
@@ -31,4 +32,10 @@ func ConnectToDB() {
 		os.Exit(2)
 	}
 	log.Println("connected")
+
+	// turned on the loger on info mode
+	DB.Logger = logger.Default.LogMode(logger.Info)
+
+	log.Print("Running the migrations...")
+	DB.AutoMigrate(&models.User{}, &models.Claims{})
 }
