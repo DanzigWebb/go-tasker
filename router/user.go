@@ -9,7 +9,7 @@ import (
 	"task-app/util"
 )
 
-func SetupUserRoutes() {
+func setupUserRoutes() {
 	USER.Post("/signup", CreateUser) // Sign Up a user
 }
 

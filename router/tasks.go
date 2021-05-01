@@ -6,9 +6,8 @@ import (
 	"task-app/models"
 )
 
-func setupTaskGroup(app *fiber.App, path string) {
-	api := app.Group(path)
-	api.Post("/create", handleCreateTask)
+func setupTasksRoutes() {
+	TASKS.Post("/create", handleCreateTask)
 }
 
 func handleCreateTask(c *fiber.Ctx) error {
@@ -17,8 +16,7 @@ func handleCreateTask(c *fiber.Ctx) error {
 
 	body := c.Body()
 	var t models.Task
-	err := json.Unmarshal(body, &t)
-	if err != nil {
+	if err := json.Unmarshal(body, &t); err != nil {
 		return c.Status(500).SendString(err.Error())
 	}
 
