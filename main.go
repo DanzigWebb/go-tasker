@@ -2,35 +2,45 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"log"
-	"net/http"
 	"task-app/models"
 )
 
-func main() {
-	http.HandleFunc("/task/create", handleCreateTask)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+func CreateServer() *fiber.App {
+	app := fiber.New()
+
+	return app
 }
 
-func handleCreateTask(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "POST":
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			panic(err)
-		}
+func main() {
+	app := CreateServer()
+	app.Use(cors.New())
 
-		fmt.Println(string(body))
-		var t models.Task
-		err = json.Unmarshal(body, &t)
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
+	app.Get("/hello", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
+	})
 
-		w.WriteHeader(200)
-		w.Write(body)
+	app.Post("/tasks/create", handleCreateTask)
+
+	app.Use(func(c *fiber.Ctx) error {
+		return c.SendStatus(404) // => 404 "Not Found"
+	})
+
+	log.Fatal(app.Listen(":3000"))
+}
+
+func handleCreateTask(c *fiber.Ctx) error {
+	c.Accepts("application/json")
+	c.Accepts("json", "text")
+
+	body := c.Body()
+	var t models.Task
+	err := json.Unmarshal(body, &t)
+	if err != nil {
+		return c.Status(500).SendString(err.Error())
 	}
+
+	return c.SendString(string(body))
 }
