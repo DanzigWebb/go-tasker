@@ -81,7 +81,7 @@ func GenerateRefreshClaims(cl *models.Claims) string {
 // SecureAuth returns a middleware which secures all the private routes
 func SecureAuth() func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		accessToken := c.Cookies("access_token")
+		accessToken := GetAccessToken(c)
 		claims := new(models.Claims)
 
 		token, err := jwt.ParseWithClaims(accessToken, claims,

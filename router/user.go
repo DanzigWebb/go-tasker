@@ -15,7 +15,7 @@ var jwtKey = []byte(db.PRIVKEY)
 func setupUserRoutes() {
 	USER.Post("/signup", CreateUser)
 	USER.Post("/login", LoginUser)
-	USER.Get("/get-access-token", GetAccessToken)
+	USER.Get("/token", GetAccessToken)
 
 	privUser := USER.Group("/private")
 	privUser.Use(util.SecureAuth()) // middleware to secure all routes for this group
