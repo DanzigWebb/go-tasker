@@ -4,7 +4,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	"math/rand"
 	"task-app/db"
 	"task-app/models"
 	"task-app/util"
@@ -53,7 +52,7 @@ func CreateUser(c *fiber.Ctx) error {
 	password := []byte(u.Password)
 	hashedPassword, err := bcrypt.GenerateFromPassword(
 		password,
-		rand.Intn(bcrypt.MaxCost-bcrypt.MinCost)+bcrypt.MinCost,
+		bcrypt.DefaultCost,
 	)
 
 	if err != nil {

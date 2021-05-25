@@ -25,7 +25,7 @@ func GenerateAccessClaims(uuid string) (*models.Claims, string) {
 	claim := &models.Claims{
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    uuid,
-			ExpiresAt: t.Add(15 * time.Minute).Unix(),
+			ExpiresAt: t.Add(15 * time.Hour).Unix(),
 			Subject:   "access_token",
 			IssuedAt:  t.Unix(),
 		},
