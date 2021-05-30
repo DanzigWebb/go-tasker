@@ -89,6 +89,12 @@ func SecureAuth() func(*fiber.Ctx) error {
 				return jwtKey, nil
 			})
 
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(
+				models.DefaultError(err.Error()),
+			)
+		}
+
 		if token.Valid {
 			if claims.ExpiresAt < time.Now().Unix() {
 				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{

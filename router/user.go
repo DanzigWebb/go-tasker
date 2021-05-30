@@ -4,6 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
+	"strconv"
 	"task-app/db"
 	"task-app/models"
 	"task-app/util"
@@ -68,7 +69,7 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 
 	// setting up the authorization cookies
-	accessToken, refreshToken := util.GenerateTokens(u.UUID.String())
+	accessToken, refreshToken := util.GenerateTokens(strconv.Itoa(int(u.ID)))
 	accessCookie, refreshCookie := util.GetAuthCookies(accessToken, refreshToken)
 	c.Cookie(accessCookie)
 	c.Cookie(refreshCookie)
@@ -106,7 +107,7 @@ func LoginUser(c *fiber.Ctx) error {
 	}
 
 	// setting up the authorization cookies
-	accessToken, refreshToken := util.GenerateTokens(u.UUID.String())
+	accessToken, refreshToken := util.GenerateTokens(strconv.Itoa(int(u.ID)))
 	accessCookie, refreshCookie := util.GetAuthCookies(accessToken, refreshToken)
 	c.Cookie(accessCookie)
 	c.Cookie(refreshCookie)

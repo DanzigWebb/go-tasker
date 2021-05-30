@@ -2,14 +2,15 @@ package models
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"gorm.io/gorm"
 )
 
 type User struct {
-	Base
+	gorm.Model
 	Email    string `json:"email" gorm:"unique"`
 	Username string `json:"username" gorm:"unique"`
 	Password string `json:"password"`
-	Tasks    []Task `gorm:"polymorphic:Owner;"`
+	Tasks    []Task `gorm:"foreignKey:UserID"`
 }
 
 // UserErrors represent the error format for user routes

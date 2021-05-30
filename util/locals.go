@@ -9,7 +9,7 @@ import (
 func GetUserByLocal(c *fiber.Ctx) (*models.User, error) {
 	id := c.Locals("id")
 	u := new(models.User)
-	if res := db.DB.Where("uuid = ?", id).First(&u); res.RowsAffected <= 0 {
+	if res := db.DB.Where("id = ?", id).First(&u); res.RowsAffected <= 0 {
 		return nil, res.Error
 	}
 
