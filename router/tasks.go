@@ -25,9 +25,8 @@ func handleCreateTask(c *fiber.Ctx) error {
 		})
 	}
 
-	id := c.Locals("id")
-	u := new(models.User)
-	if res := db.DB.Where("uuid = ?", id).First(&u); res.RowsAffected <= 0 {
+	u, err := util.GetUserByLocal(c)
+	if err != nil {
 		return c.JSON(models.DefaultError("Cannot find the User"))
 	}
 
@@ -47,6 +46,10 @@ func handleCreateTask(c *fiber.Ctx) error {
 		})
 	}
 
+	t.ID = task.ID
+	t.CreatedAt = task.CreatedAt.String()
+	t.UpdatedAt = task.UpdatedAt
+
 	return c.Status(fiber.StatusOK).JSON(t)
 }
 
@@ -54,25 +57,32 @@ func handleUpdateTask(c *fiber.Ctx) error {
 	c.Accepts("application/json")
 	c.Accepts("json", "text")
 
+	var sendError = func(m string, s int) error {
+		return models.DefaultError(m).SendStatus(c, s)
+	}
+
 	var t models.TaskApi
 
 	if err := c.BodyParser(&t); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(
-			models.DefaultError("Invalid request data"),
+		return sendError(
+			"Invalid request data",
+			fiber.StatusBadRequest,
 		)
 	}
 
 	if t.ID < 1 {
-		return c.Status(fiber.StatusBadRequest).JSON(
-			models.DefaultError("Task ID is required field"),
+		return sendError(
+			"Task ID is required field",
+			fiber.StatusBadRequest,
 		)
 	}
 
 	user, err := util.GetUserByLocal(c)
 
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(
-			models.DefaultError("Cant find user"),
+		return sendError(
+			"Cannot find user",
+			fiber.StatusBadRequest,
 		)
 	}
 
@@ -82,7 +92,10 @@ func handleUpdateTask(c *fiber.Ctx) error {
 	).Model(models.Task{}).First(&task)
 
 	if result.Error != nil {
-		return c.Status(fiber.StatusForbidden).JSON(models.DefaultError("Cannot find the Task"))
+		return sendError(
+			"Cannot find the Task",
+			fiber.StatusForbidden,
+		)
 	}
 
 	task.Title = t.Title
@@ -92,7 +105,10 @@ func handleUpdateTask(c *fiber.Ctx) error {
 	result = db.DB.Save(&task)
 
 	if result.Error != nil {
-		return c.Status(fiber.StatusForbidden).JSON(models.DefaultError("Cant update task " + result.Error.Error()))
+		return sendError(
+			"Cannot update task "+result.Error.Error(),
+			fiber.StatusForbidden,
+		)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(task)
